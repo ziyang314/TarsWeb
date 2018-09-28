@@ -12,7 +12,7 @@
             <let-table-column :title="$t('operate.operates')" width="260px">
             <template slot-scope="scope">
                 <let-table-operation @click="showDebuger(scope.row)">{{$t('inf.list.debug')}}</let-table-operation>  
-                <let-table-operation @click="deleteFile(scope.row.f_id)">{{$t('operate.delete')}}</let-table-operation>
+                <let-table-operation @click="deleteTarsFile(scope.row.f_id)">{{$t('operate.delete')}}</let-table-operation>
             </template>
             </let-table-column>
         </let-table>
@@ -66,7 +66,7 @@
             ref="uploadForm"
             itemWidth="100%"
             @submit.native.prevent="uploadTarsFile">
-                <let-form-item :label="$t('inf.title.dlgTitle')" itemWidth="400px">
+                <let-form-item itemWidth="400px">
                 <let-uploader
                     :placeholder="$t('pub.dlg.defaultValue')"
                     @upload="uploadFile" require>
@@ -180,6 +180,22 @@ export default {
                 this.contextData = data;
             }).catch((err) => {
                 this.$tip.error(`${this.$t('common.error')}: ${err.message || err.err_msg}`);
+            });
+        },
+        deleteTarsFile(id) {
+            this.$confirm(this.$t('inf.dlg.deleteMsg'), this.$t('common.alert')).then(()=>{
+                const loading = this.$Loading.show();
+                this.$ajax.getJSON('/server/api/delete_tars_file', {
+                    id : id
+                }).then(data => {
+                    loading.hide();
+                    this.getFileList();
+                }).catch(err=>{
+                    loading.hide();
+                    this.$tip.error(`${this.$t('common.error')}: ${err.message || err.err_msg}`);
+                });
+            }).catch(()=>{
+
             });
         },
         getParams(value) {
